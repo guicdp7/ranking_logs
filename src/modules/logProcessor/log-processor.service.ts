@@ -24,6 +24,22 @@ export class LogProcessorService {
     return LOG_FORMATS.find((item) => item.rule.test(text));
   }
 
+  private getLogTypeParams(
+    text: string,
+    type: (typeof LOG_FORMATS)[number],
+  ): Record<string, string> {
+    if (!type.params) {
+      return {};
+    }
+    return Object.keys(type.params).reduce(
+      (result, key) => ({
+        ...result,
+        [key]: type.params[key](text),
+      }),
+      {},
+    );
+  }
+
   private convertToLogLineObject() {
     return new Transform({
       transform: (
@@ -37,10 +53,17 @@ export class LogProcessorService {
           return;
         }
         const logLineObj: Partial<LogLine> = {};
-        const logParts = text.split(' - ');
+        const [dateText, actionText] = text.split(' - ');
 
-        logLineObj.date = this.getLogDate(logParts[0]);
-        logLineObj.type = this.getLogType(logParts[1])?.name ?? 'unknown';
+        const type = this.getLogType(actionText);
+
+        logLineObj.text = text;
+        logLineObj.date = this.getLogDate(dateText);
+        logLineObj.type = type?.name ?? 'unknown';
+
+        if (type) {
+          logLineObj.details = this.getLogTypeParams(actionText, type);
+        }
 
         callback(undefined, JSON.stringify(logLineObj));
       },

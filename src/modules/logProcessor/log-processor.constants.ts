@@ -2,12 +2,20 @@ export const LOG_FORMATS = [
   {
     rule: new RegExp('new\\smatch\\s[0-9]+\\shas\\sstarted', 'i'),
     name: 'match_started',
-    params: {},
+    params: {
+      id: (text: string) => {
+        return /[0-9]+/.exec(text)[0];
+      },
+    },
   },
   {
     rule: new RegExp('match\\s[0-9]+\\shas\\sended', 'i'),
     name: 'match_ended',
-    params: {},
+    params: {
+      id: (text: string) => {
+        return /[0-9]+/.exec(text)[0];
+      },
+    },
   },
   {
     rule: new RegExp(
@@ -15,7 +23,14 @@ export const LOG_FORMATS = [
       'i',
     ),
     name: 'world_kill',
-    params: {},
+    params: {
+      player: (text: string) => {
+        return /killed\s[a-z0-9_]+/i.exec(text)[0].split(' ')[1];
+      },
+      weapon: (text: string) => {
+        return /by\s[a-z0-9_]+/i.exec(text)[0].split(' ')[1];
+      },
+    },
   },
   {
     rule: new RegExp(
@@ -23,6 +38,16 @@ export const LOG_FORMATS = [
       'i',
     ),
     name: 'hit_kill',
-    params: {},
+    params: {
+      killedBy: (text: string) => {
+        return /[a-z0-9_]+\skilled/i.exec(text)[0].split(' ')[0];
+      },
+      player: (text: string) => {
+        return /killed\s[a-z0-9_]+/i.exec(text)[0].split(' ')[1];
+      },
+      weapon: (text: string) => {
+        return /using\s[a-z0-9_]+/i.exec(text)[0].split(' ')[1];
+      },
+    },
   },
 ];
