@@ -9,9 +9,11 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express/multer';
 
+import { LogProcessorService } from './modules/logProcessor/log-processor.service';
+
 @Controller()
 export class AppController {
-  constructor() {}
+  constructor(private service: LogProcessorService) {}
 
   @Get()
   @Render('index')
@@ -29,6 +31,8 @@ export class AppController {
   @Redirect('/')
   @UseInterceptors(FileInterceptor('file'))
   upload(@UploadedFile() file: Express.Multer.File) {
-    console.log(file);
+    this.service.handle(file.buffer).on('data', (data: Buffer) => {
+      console.log('data >>', data.toString());
+    });
   }
 }
