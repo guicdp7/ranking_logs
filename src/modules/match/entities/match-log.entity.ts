@@ -19,11 +19,11 @@ export class MatchLog {
   @Column('varchar')
   type: string;
 
-  @Column('int')
-  text: number;
+  @Column('varchar')
+  text: string;
 
   @Column('datetime')
-  date: number;
+  date: Date;
 
   @ManyToOne(() => Match, (match) => match.logs)
   @JoinColumn({ name: 'matchId' })

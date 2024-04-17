@@ -21,8 +21,9 @@ export class AppController {
 
   @Get()
   @Render('index')
-  index() {
-    return {};
+  async index() {
+    const items = await this.match.findAll();
+    return { items };
   }
 
   @Get('import')
@@ -35,6 +36,6 @@ export class AppController {
   @Redirect('/')
   @UseInterceptors(FileInterceptor('file'))
   upload(@UploadedFile() file: Express.Multer.File) {
-    this.match.convertLogsToMatches(this.processor.handle(file.buffer));
+    this.match.importMatchLogs(this.processor.handle(file.buffer));
   }
 }
