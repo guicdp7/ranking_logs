@@ -19,11 +19,35 @@ export class AppController {
     private match: MatchService,
   ) {}
 
+  private formatDate(date: Date) {
+    const obj = new Date(date);
+    const year = obj.getFullYear();
+
+    let day: any = obj.getDate();
+    day = day < 10 ? `0${day}` : day;
+
+    let month: any = obj.getMonth();
+    month = month < 10 ? `0${month}` : month;
+
+    let hour: any = obj.getHours();
+    hour = hour < 10 ? `0${hour}` : hour;
+
+    let minutes: any = obj.getMinutes();
+    minutes = minutes < 10 ? `0${minutes}` : minutes;
+
+    return `${day}/${month}/${year} às ${hour}:${minutes}`;
+  }
+
   @Get()
   @Render('index')
   async index() {
     const items = await this.match.findAll();
-    return { items };
+    return {
+      items: (items as any).map((item) => ({
+        ...item,
+        startedAt: this.formatDate(item.startedAt),
+      })),
+    };
   }
 
   @Get('import')

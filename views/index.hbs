@@ -14,11 +14,7 @@
             </div>
         </header>
         <div class="row">
-            <div class="col-4">
-            </div>
-            <div class="col-4">
-            </div>
-            <div class="col-4 text-end">
+            <div class="col-12">
                 <a href="/import"><button type="button" class="btn btn-primary">Importar Logs</button></a>
             </div>
         </div>
@@ -29,13 +25,27 @@
                         <tr>
                             <th>#</th>
                             <th>Data</th>
+                            <th>Frags</th>
+                            <th>Vencedor</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
+                        {{#each items}}
                         <tr>
-                            <td colspan="3">Nada para mostrar</td>
+                            <td>{{ identifier }}</td>
+                            <td>{{ startedAt }}</td>
+                            <td>{{ numberOfFrags }}</td>
+                            <td>{{ playerThatWon }}</td>
+                            <td>
+                                <a><button type="button" class="btn btn-secondary">Detalhes</button></a>
+                            </td>
                         </tr>
+                        {{else}}
+                        <tr>
+                            <td colspan="5">Nada para mostrar</td>
+                        </tr>
+                        {{/each}}
                     </tbody>
                 </table>
             </div>
