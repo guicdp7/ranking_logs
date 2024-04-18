@@ -29,7 +29,7 @@ A aplicação `ranking_logs` é uma API desenvolvida com NestJS e TypeORM para p
 
 Segue um exemplo do formato de logs aceito pela aplicação:
 
-`
+```
 24/04/2020 16:14:22 - New match 11348961 has started
 24/04/2020 16:26:12 - Roman killed Marcus using M16
 24/04/2020 16:35:56 - Marcus killed Jhon using AK47
@@ -37,6 +37,6 @@ Segue um exemplo do formato de logs aceito pela aplicação:
 24/04/2020 18:26:14 - Bryan killed Marcus using AK47
 24/04/2020 19:36:33 - <WORLD> killed Marcus by DROWN
 24/04/2020 20:19:22 - Match 11348961 has ended
-`
+```
 
 Certifique-se de que seus logs sigam este formato para que a aplicação possa processá-los corretamente.
