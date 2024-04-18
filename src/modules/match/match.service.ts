@@ -141,15 +141,19 @@ export class MatchService {
       ({ type }) => type === 'hit_kill',
     ).length;
 
-    const playerThatWon = players.sort((a, b) =>
-      a.numberOfFrags > b.numberOfFrags
-        ? -1
-        : a.numberOfFrags === b.numberOfFrags
-          ? a.numberOfDeaths > b.numberOfDeaths
-            ? 1
-            : -1
-          : 1,
-    )[0];
+    players = players
+      .sort((a, b) =>
+        a.numberOfFrags > b.numberOfFrags
+          ? -1
+          : a.numberOfFrags === b.numberOfFrags
+            ? a.numberOfDeaths > b.numberOfDeaths
+              ? 1
+              : -1
+            : 1,
+      )
+      .map((item, index) => ({ ...item, ranking: index + 1 }));
+
+    const playerThatWon = players[0];
 
     match.playerThatWon = playerThatWon.name;
     match.favoriteWeapon = playerThatWon.favoriteWeapon;

@@ -39,5 +39,5 @@ export class Match {
   players: MatchPlayer[];
 
   @OneToMany(() => MatchLog, (log) => log.match)
-  logs: MatchPlayer[];
+  logs: MatchLog[];
 }

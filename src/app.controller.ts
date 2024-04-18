@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Param,
   Post,
   Redirect,
   Render,
@@ -43,7 +44,7 @@ export class AppController {
   async index() {
     const items = await this.match.findAll();
     return {
-      items: (items as any).map((item) => ({
+      items: items.map((item) => ({
         ...item,
         startedAt: this.formatDate(item.startedAt),
       })),
@@ -61,5 +62,21 @@ export class AppController {
   @UseInterceptors(FileInterceptor('file'))
   upload(@UploadedFile() file: Express.Multer.File) {
     this.match.importMatchLogs(this.processor.handle(file.buffer));
+  }
+
+  @Get(':id([0-9]+)')
+  @Render('details')
+  async details(@Param('id') id: string) {
+    const item = await this.match.findOne(Number(id));
+    return {
+      ...item,
+      startedAt: this.formatDate(item.startedAt),
+      finishedAt: this.formatDate(item.finishedAt),
+      players: item.players.sort((a, b) => (a.ranking > b.ranking ? 1 : -1)),
+      logs: item.logs.map((log) => ({
+        ...log,
+        date: this.formatDate(log.date),
+      })),
+    };
   }
 }

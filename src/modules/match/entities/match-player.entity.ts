@@ -16,6 +16,9 @@ export class MatchPlayer {
   @Column('int')
   matchId: number;
 
+  @Column('int')
+  ranking: number;
+
   @Column('varchar')
   name: string;
 
