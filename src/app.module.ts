@@ -1,13 +1,15 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { resolve } from 'path';
 
 import { AppController } from './app.controller';
 import { LogProcessorModule } from './modules/logProcessor/log-processor.module';
 import { MatchModule } from './modules/match/match.module';
-import { resolve } from 'path';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     LogProcessorModule,
     MatchModule,
     TypeOrmModule.forRoot({

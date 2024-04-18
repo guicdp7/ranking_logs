@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -10,6 +11,8 @@ import { MatchSearchService } from './match-search.service';
 
 @Injectable()
 export class MatchPersistService {
+  private maxPlayers = 20;
+
   constructor(
     @InjectRepository(Match)
     private repository: Repository<Match>,
@@ -18,15 +21,18 @@ export class MatchPersistService {
     @InjectRepository(MatchLog)
     private logRepository: Repository<MatchLog>,
     private search: MatchSearchService,
-  ) {}
+    private config: ConfigService,
+  ) {
+    this.maxPlayers = this.config.get('MAX_PLAYERS_BY_MATCH', 20);
+  }
 
   async save(
     match: Partial<Match>,
     logs: Partial<MatchLog>[] = [],
     players: Partial<MatchPlayer>[] = [],
   ) {
-    if (players.length > 20) {
-      throw new MaxPlayersExceededException();
+    if (players.length > this.maxPlayers) {
+      throw new MaxPlayersExceededException(this.maxPlayers);
     }
 
     const savedMatch = await this.repository.save(

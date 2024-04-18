@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { MatchLog } from './entities/match-log.entity';
@@ -9,7 +10,10 @@ import { MatchSearchService } from './match-search.service';
 import { MatchService } from './match.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Match, MatchPlayer, MatchLog])],
+  imports: [
+    ConfigModule,
+    TypeOrmModule.forFeature([Match, MatchPlayer, MatchLog]),
+  ],
   providers: [MatchPersistService, MatchSearchService, MatchService],
   exports: [MatchService],
 })

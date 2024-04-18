@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 export class MaxPlayersExceededException extends HttpException {
-  constructor() {
+  constructor(maxPlayers = 20) {
     super(
-      'the ranking allows matches with up to 20 players',
+      `the ranking allows matches with up to ${maxPlayers} players`,
       HttpStatus.UNPROCESSABLE_ENTITY,
     );
   }
