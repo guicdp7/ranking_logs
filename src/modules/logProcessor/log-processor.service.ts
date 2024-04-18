@@ -47,7 +47,7 @@ export class LogProcessorService {
         encoding: string,
         callback: TransformCallback,
       ) => {
-        const text = chunk.toString();
+        const text = chunk.toString().trim();
         if (!text || !text.length) {
           callback(undefined, undefined);
           return;
