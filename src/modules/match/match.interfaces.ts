@@ -7,3 +7,5 @@ export interface MatchLogConverted {
   logs: Partial<MatchLog>[];
   players: Partial<MatchPlayer>[];
 }
+
+export type WeaponUsageByPlayerType = Record<string, Record<string, number>>;

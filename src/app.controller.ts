@@ -3,7 +3,6 @@ import {
   Get,
   Param,
   Post,
-  Redirect,
   Render,
   UploadedFile,
   UseInterceptors,
@@ -11,6 +10,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express/multer';
 
 import { LogProcessorService } from './modules/logProcessor/log-processor.service';
+import { MaxPlayersExceededException } from './modules/match/exceptions/max-players-exceeded.exception';
 import { MatchService } from './modules/match/match.service';
 
 @Controller()
@@ -58,10 +58,23 @@ export class AppController {
   }
 
   @Post('upload')
-  @Redirect('/')
+  @Render('upload')
   @UseInterceptors(FileInterceptor('file'))
-  upload(@UploadedFile() file: Express.Multer.File) {
-    this.match.importMatchLogs(this.processor.handle(file.buffer));
+  async upload(@UploadedFile() file: Express.Multer.File) {
+    const data = await this.match
+      .importMatchLogs(this.processor.handle(file.buffer))
+      .catch((e) => e);
+
+    if (data instanceof MaxPlayersExceededException) {
+      return {
+        status: 'Erro',
+        message: 'número máximo de jogadores excedido',
+      };
+    }
+    return {
+      status: 'Sucesso',
+      message: 'o upload foi realizado com sucesso',
+    };
   }
 
   @Get(':id([0-9]+)')

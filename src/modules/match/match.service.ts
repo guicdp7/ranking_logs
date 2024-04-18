@@ -7,7 +7,7 @@ import { MatchPlayer } from './entities/match-player.entity';
 import { Match } from './entities/match.entity';
 import { MatchPersistService } from './match-persist.service';
 import { MatchSearchService } from './match-search.service';
-import { MatchLogConverted } from './match.interfaces';
+import { MatchLogConverted, WeaponUsageByPlayerType } from './match.interfaces';
 
 @Injectable()
 export class MatchService {
@@ -86,12 +86,22 @@ export class MatchService {
     });
   }
 
-  private calcMatchDetails(
-    match: Partial<Match>,
-    logLines: LogLine[],
-  ): MatchLogConverted {
-    let players: Partial<MatchPlayer>[] = [];
-    const weaponUsageByPlayer: Record<string, Record<string, number>> = {};
+  private sortPlayersFromBestToLoser(
+    a: Partial<MatchPlayer>,
+    b: Partial<MatchPlayer>,
+  ) {
+    return a.numberOfFrags > b.numberOfFrags
+      ? -1
+      : a.numberOfFrags === b.numberOfFrags
+        ? a.numberOfDeaths > b.numberOfDeaths
+          ? 1
+          : -1
+        : 1;
+  }
+
+  private identifyMatchPlayersAndWeaponsByLogLines(logLines: LogLine[]) {
+    const players: Partial<MatchPlayer>[] = [];
+    const weaponUses: WeaponUsageByPlayerType = {};
 
     const pushPlayer = (name: string) => {
       if (!players.find((item) => item.name === name)) {
@@ -109,24 +119,29 @@ export class MatchService {
     });
 
     players.forEach(({ name }) => {
-      weaponUsageByPlayer[name] = logLines.reduce(
-        (result, { details, type }) => {
-          if (type === 'hit_kill' && details.killedBy === name) {
-            return {
-              ...result,
-              [details.weapon]: (result[details.weapon] ?? 0) + 1,
-            };
-          }
-          return result;
-        },
-        {},
-      );
+      weaponUses[name] = logLines.reduce((result, { details, type }) => {
+        if (type === 'hit_kill' && details.killedBy === name) {
+          return {
+            ...result,
+            [details.weapon]: (result[details.weapon] ?? 0) + 1,
+          };
+        }
+        return result;
+      }, {});
     });
+    return { players, weaponUses };
+  }
 
-    players = players.map(({ name }) => ({
+  private calculatePlayerDetails(
+    player: Partial<MatchPlayer>,
+    logLines: LogLine[],
+    weaponUses: WeaponUsageByPlayerType,
+  ) {
+    const { name } = player;
+    return {
       name,
-      favoriteWeapon: Object.keys(weaponUsageByPlayer[name]).sort((a, b) =>
-        weaponUsageByPlayer[name][a] > weaponUsageByPlayer[name][b] ? -1 : 1,
+      favoriteWeapon: Object.keys(weaponUses[name]).sort((a, b) =>
+        weaponUses[name][a] > weaponUses[name][b] ? -1 : 1,
       )[0],
       numberOfFrags: logLines.filter(
         ({ type, details }) => type === 'hit_kill' && details.killedBy === name,
@@ -135,25 +150,26 @@ export class MatchService {
         ({ type, details }) =>
           ['hit_kill', 'world_kill'].includes(type) && details.player === name,
       ).length,
-    }));
+    };
+  }
+
+  private calcMatchDetails(
+    match: Partial<Match>,
+    logLines: LogLine[],
+  ): MatchLogConverted {
+    const { players, weaponUses } =
+      this.identifyMatchPlayersAndWeaponsByLogLines(logLines);
+
+    const sortedPlayers: Partial<MatchPlayer>[] = players
+      .map((item) => this.calculatePlayerDetails(item, logLines, weaponUses))
+      .sort(this.sortPlayersFromBestToLoser)
+      .map((item, index) => ({ ...item, ranking: index + 1 }));
 
     match.numberOfFrags = logLines.filter(
       ({ type }) => type === 'hit_kill',
     ).length;
 
-    players = players
-      .sort((a, b) =>
-        a.numberOfFrags > b.numberOfFrags
-          ? -1
-          : a.numberOfFrags === b.numberOfFrags
-            ? a.numberOfDeaths > b.numberOfDeaths
-              ? 1
-              : -1
-            : 1,
-      )
-      .map((item, index) => ({ ...item, ranking: index + 1 }));
-
-    const playerThatWon = players[0];
+    const playerThatWon = sortedPlayers[0];
 
     match.playerThatWon = playerThatWon.name;
     match.favoriteWeapon = playerThatWon.favoriteWeapon;
@@ -167,7 +183,7 @@ export class MatchService {
     return {
       match,
       logs,
-      players,
+      players: sortedPlayers,
     };
   }
 }
