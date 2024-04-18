@@ -1,7 +1,7 @@
 # ranking_logs
 
 ## Descrição
-A aplicação `ranking_logs` é uma API desenvolvida com NestJS e TypeORM para processar arquivos de logs de partidas de jogos de tiro em primeira pessoa. Ele gera um ranking dos jogadores presentes em cada partida, identifica a quantidade de frags e mortes de cada jogador, sua arma favorita e outras informações relevantes sobre a partida.
+A aplicação `ranking_logs` foi desenvolvida com NestJS e TypeORM para processar arquivos de logs de partidas de jogos de tiro em primeira pessoa. Ele gera um ranking dos jogadores presentes em cada partida, identifica a quantidade de frags e mortes de cada jogador, sua arma favorita e outras informações relevantes sobre a partida.
 
 ## Funcionalidades
 
@@ -15,11 +15,10 @@ A aplicação `ranking_logs` é uma API desenvolvida com NestJS e TypeORM para p
 - Possibilidade de limitar a quantidade de jogadores por partida através da variável de ambiente `MAX_PLAYERS_BY_MATCH` (padrão: 20 jogadores).
 - Utilização do banco de dados SQLite para armazenamento dos dados das partidas, com o arquivo do banco localizado em `db/sql`.
 - Configuração da porta da aplicação via arquivo `.env` (variável `APP_PORT`, padrão: 3000).
-- Inicialização da aplicação através do comando `npm run start`.
 
 ## Configuração
 
-1. Certifique-se de ter o Node.js instalado em sua máquina.
+1. Certifique-se de ter o Node.js e npm instalados em sua máquina.
 2. Clone o repositório `ranking_logs`.
 3. Execute `npm install` para instalar as dependências do projeto.
 4. Defina as variáveis de ambiente necessárias no arquivo `.env`, se necessário.
